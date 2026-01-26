@@ -27,7 +27,9 @@
         <meta property="twitter:title" content="Planet Mozilla" />
         <meta property="twitter:image" content="https://planet.mozilla.org/img/planet_banner.png" />
         <link href='planet.css' rel='stylesheet' type='text/css'/>
-        <link href='img/mozilla-16.png' rel='shortcut icon' type='image/png'/>
+        <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="img/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="196x196" href="img/favicon-196x196.png" />
+        <link rel="shortcut icon" href="img/favicon.ico" />
         <xsl:if test='atom:link[@rel="self"]/@type'>
           <link rel='alternate' href='{atom:link[@rel="self"]/@href}'
             title='{atom:title/text()}' type='{atom:link[@rel="self"]/@type}'/>
