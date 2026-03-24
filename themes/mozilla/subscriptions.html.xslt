@@ -7,7 +7,7 @@
 
   <xsl:output method="xml" omit-xml-declaration="yes"/>
 
-  <xsl:param name="page-title" select="'Homepage'"/>
+  <xsl:param name="page-title" select="'Subscriptions'"/>
   <xsl:include href="partials/head.html.xslt" />
   <xsl:include href="partials/header.html.xslt" />
   <xsl:include href="partials/sidebar.html.xslt" />
@@ -27,92 +27,85 @@
         <xsl:call-template name="header"/>
         <div class="main-container">
           <div class='main-content'>
-            <!-- START Entries -->
-            <xsl:for-each select='atom:entry'>
-              <article class="post feed-{atom:source/planet:css-id}">
-
-                <xsl:if test="@xml:lang">
-                  <xsl:attribute name="xml:lang">
-                    <xsl:value-of select="@xml:lang"/>
-                  </xsl:attribute>
-                </xsl:if>
-
-                <!-- Entry header -->
-                <header>
-                  <p>
-                    <span class="label">
-                      <xsl:if test="atom:source/atom:link[@rel='alternate']/@href">
-                        <xsl:attribute name="href">
-                          <xsl:value-of
-                            select="atom:source/atom:link[@rel='alternate']/@href"/>
-                        </xsl:attribute>
-                      </xsl:if>
-                      <xsl:attribute name="title">
-                        <xsl:value-of select="atom:source/atom:title"/>
-                      </xsl:attribute>
-                      <xsl:value-of select="atom:source/planet:name"/>
-                    </span>
-                  </p>
-
-                  <!-- entry title -->
-                  <h3 class="post-title">
-                    <xsl:if test="string-length(atom:title) &gt; 0">
-                      <a href="{atom:link[@rel='alternate']/@href}">
-                        <xsl:if test="atom:title/@xml:lang != @xml:lang">
-                          <xsl:attribute name="xml:lang" select="{atom:title/@xml:lang}"/>
-                        </xsl:if>
-                        <xsl:value-of select="atom:title"/>
-                      </a>
-                    </xsl:if>
-                  </h3>
-
-                  <!-- entry metadata -->
-                  <p class="post-metadata">
+            <h2>Subscriptions</h2>
+            <ul class='subscriptions'>
+              <xsl:for-each select="planet:source">
+                <xsl:sort select="planet:name"/>
+                <xsl:variable name="id" select="atom:id"/>
+                <xsl:variable name="posts"
+                  select="/atom:feed/atom:entry[atom:source/atom:id = $id]"/>
+                <li>
+                  <!-- icon -->
+                  <a title="subscribe">
                     <xsl:choose>
-                      <xsl:when test="atom:author/atom:name">
-                        <xsl:if test="not(atom:link[@rel='license'] or
-                                          atom:source/atom:link[@rel='license'] or
-                                          atom:rights or atom:source/atom:rights)">
-                          <xsl:text> By </xsl:text>
-                        </xsl:if>
-                        <xsl:value-of select="atom:author/atom:name"/>
-                        <xsl:text> on </xsl:text>
+                      <xsl:when test="planet:http_location">
+                        <xsl:attribute name="href">
+                          <xsl:value-of select="planet:http_location"/>
+                        </xsl:attribute>
                       </xsl:when>
-                      <xsl:when test="atom:source/atom:author/atom:name">
-                        <xsl:if test="not(atom:link[@rel='license'] or
-                                          atom:source/atom:link[@rel='license'] or
-                                          atom:rights or atom:source/atom:rights)">
-                          <xsl:text> By </xsl:text>
-                        </xsl:if>
-                        <xsl:value-of select="atom:source/atom:author/atom:name"/>
-                        <xsl:text> on </xsl:text>
+                      <xsl:when test="atom:link[@rel='self']/@href">
+                        <xsl:attribute name="href">
+                          <xsl:value-of select="atom:link[@rel='self']/@href"/>
+                        </xsl:attribute>
                       </xsl:when>
                     </xsl:choose>
-                    <time datetime="substring(atom:updated,1,10)">
-                      <xsl:value-of select="atom:updated/@planet:format"/>
-                    </time>
-                  </p>
-                </header>
+                    <img src="assets/img/feed.svg" width="10" height="10" alt="" />
+                  </a>
+                  <xsl:text> </xsl:text>
 
-                <!-- entry content -->
-                <div class="post-content">
-                  <xsl:choose>
-                    <xsl:when test="atom:content">
-                      <xsl:apply-templates select="atom:content"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:apply-templates select="atom:summary"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                </div>
-              </article>
-            </xsl:for-each>
-            <!-- END Entries -->
+                  <!-- name -->
+                  <a>
+                    <xsl:if test="atom:link[@rel='alternate']/@href">
+                      <xsl:attribute name="href">
+                        <xsl:value-of select="atom:link[@rel='alternate']/@href"/>
+                      </xsl:attribute>
+                    </xsl:if>
+
+                    <xsl:choose>
+                      <xsl:when test="planet:message">
+                        <xsl:attribute name="class">
+                          <xsl:if test="$posts">active message</xsl:if>
+                          <xsl:if test="not($posts)">message</xsl:if>
+                        </xsl:attribute>
+                        <xsl:attribute name="title">
+                          <xsl:value-of select="planet:message"/>
+                        </xsl:attribute>
+                      </xsl:when>
+                      <xsl:when test="atom:title">
+                        <xsl:attribute name="title">
+                          <xsl:value-of select="atom:title"/>
+                       </xsl:attribute>
+                        <xsl:if test="$posts">
+                          <xsl:attribute name="class">active</xsl:attribute>
+                        </xsl:if>
+                      </xsl:when>
+                    </xsl:choose>
+                    <xsl:value-of select="planet:name"/>
+                  </a>
+
+                  <xsl:if test="$posts[string-length(atom:title) &gt; 0]">
+                    <ul>
+                      <xsl:for-each select="$posts">
+                        <xsl:if test="string-length(atom:title) &gt; 0">
+                          <li>
+                            <a href="{atom:link[@rel='alternate']/@href}">
+                              <xsl:if test="atom:title/@xml:lang != @xml:lang">
+                                <xsl:attribute name="xml:lang"
+                                  select="{atom:title/@xml:lang}"/>
+                              </xsl:if>
+                              <xsl:value-of select="atom:title"/>
+                            </a>
+                          </li>
+                        </xsl:if>
+                      </xsl:for-each>
+                    </ul>
+                  </xsl:if>
+                </li>
+              </xsl:for-each>
+            </ul>
           </div>
           <xsl:call-template name="sidebar"/>
         </div>
-
-
       </body>
     </html>
   </xsl:template>
